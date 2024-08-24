@@ -9,9 +9,29 @@ Same way you would install a typical laravel application.
 
     npm install
 
-    npm run dev
+Generate environment variable file:
 
-    php artisan serve
+```shell
+cp .env.example .env
+```
+
+Generate application key:
+
+```shell
+php artisan key:generate
+```
+
+Start Vite server:
+
+```shell
+npm run dev
+```
+
+Serve application:
+
+```shell
+php artisan serve
+```
 
 The UI is displayed on the root page
 
