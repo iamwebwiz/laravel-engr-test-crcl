@@ -21,6 +21,12 @@ Generate application key:
 php artisan key:generate
 ```
 
+Migrate database:
+
+```shell
+php artisan migrate
+```
+
 Start Vite server:
 
 ```shell
