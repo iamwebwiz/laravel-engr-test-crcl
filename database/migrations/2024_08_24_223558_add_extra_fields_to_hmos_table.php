@@ -13,7 +13,7 @@ return new class extends Migration
     {
         if (! Schema::hasColumns('hmos', ['batch_strategy', 'email'])) {
             Schema::table('hmos', function (Blueprint $table) {
-                $table->string('batch_strategy')->nullable();
+                $table->string('batching_strategy')->nullable();
                 $table->string('email')->nullable();
             });
         }
@@ -26,7 +26,7 @@ return new class extends Migration
     {
         if (Schema::hasColumns('hmos', ['batch_strategy', 'email'])) {
             Schema::table('hmos', function (Blueprint $table) {
-                $table->dropColumn(['batch_strategy', 'email']);
+                $table->dropColumn(['batching_strategy', 'email']);
             });
         }
     }
