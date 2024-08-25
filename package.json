@@ -3,18 +3,28 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "vite build"
+        "build": "vite build",
+        "test": "vitest",
+        "coverage": "vitest run --coverage"
     },
     "devDependencies": {
         "@inertiajs/vue3": "^1.0.0",
         "@tailwindcss/forms": "^0.5.3",
         "@vitejs/plugin-vue": "^5.0.0",
+        "@vue/test-utils": "^2.4.6",
         "autoprefixer": "^10.4.12",
         "axios": "^1.6.4",
+        "happy-dom": "^14.12.3",
+        "jsdom": "^24.1.1",
         "laravel-vite-plugin": "^1.0",
         "postcss": "^8.4.31",
         "tailwindcss": "^3.2.1",
         "vite": "^5.0",
+        "vitest": "^2.0.5",
         "vue": "^3.4.0"
+    },
+    "dependencies": {
+        "@inertiajs/core": "^1.2.0",
+        "ziggy-js": "^2.3.0"
     }
 }
