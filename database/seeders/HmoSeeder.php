@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class HmoSeeder extends Seeder
 {
-    private $hmos = [
+    private array $hmos = [
         ['name'=>'HMO A', 'code'=> 'HMO-A', 'email' => 'hmo.a@curacel.com', 'batching_strategy' => BatchingStrategyEnum::SUBMISSION_DATE->value],
         ['name'=>'HMO B', 'code'=> 'HMO-B', 'email' => 'hmo.b@curacel.com', 'batching_strategy' => BatchingStrategyEnum::ENCOUNTER_DATE->value],
         ['name'=>'HMO C', 'code'=> 'HMO-C', 'email' => 'hmo.c@curacel.com', 'batching_strategy' => BatchingStrategyEnum::ENCOUNTER_DATE->value],

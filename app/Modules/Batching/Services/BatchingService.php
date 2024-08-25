@@ -30,7 +30,7 @@ class BatchingService
     {
         return [
             'provider_name' => ['required', 'string'],
-            'hmo_code' => ['required', 'string', 'exists:hmo,hmo_code'],
+            'hmo_code' => ['required', 'string', 'exists:hmos,code'],
             'encounter_date' => ['required', 'date'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.name' => ['required', 'string'],
@@ -50,7 +50,7 @@ class BatchingService
         if ($orderHmo->batching_strategy && ! empty($this->strategies[$orderHmo->batching_strategy])) {
             $strategy = $this->strategies[$orderHmo->batching_strategy];
         } else {
-            $strategy = self::DEFAULT_STRATEGY;
+            $strategy = $this->strategies[self::DEFAULT_STRATEGY];
         }
 
         $batch = app($strategy)->getBatch($order);
@@ -69,14 +69,14 @@ class BatchingService
     {
         $payload = $request->validated();
 
-        $hmo = Hmo::query()->where('hmo_code', $payload['hmo_code'])->first();
+        $hmo = Hmo::query()->where('code', $payload['hmo_code'])->first();
 
         DB::beginTransaction();
 
         try {
             $total = 0; // the total order amount
 
-            foreach ($payload['items'] as $item) {
+            foreach ($payload['items'] as &$item) {
                 $item['sub_total'] = $item['quantity'] * $item['unit_price'];
                 $total += $item['sub_total'];
             }
@@ -106,7 +106,7 @@ class BatchingService
             if ($exception instanceof HmoNotSetException || $exception instanceof BatchingException) {
                 $message = $exception->getMessage();
             } else {
-                $message = 'An error occurred while trying to create a batch for this order. Please try again later.';
+                $message = 'An error occurred while trying to create a batch for this order. Please try again later or contact the administrator.';
             }
 
             session()->flash('alert', [

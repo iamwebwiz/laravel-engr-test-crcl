@@ -9,7 +9,7 @@ Route::get('/', function () {
     return Inertia::render('SubmitOrder');
 });
 
-Route::post('/orders/batch', BatchingService::class);
+Route::post('/orders/batch', BatchingService::class)->name('batch-order');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
