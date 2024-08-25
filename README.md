@@ -43,5 +43,14 @@ The UI is displayed on the root page
 
 ## Extra Notes
 
+Run tests for backend implementation
 
+```shell
+php artisan test
+```
 
+Run tests for the order submission form to ensure correctness of calculations:
+
+```shell
+npm run test
+```
