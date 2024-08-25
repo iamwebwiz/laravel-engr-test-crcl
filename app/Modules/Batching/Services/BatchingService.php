@@ -2,12 +2,17 @@
 
 namespace App\Modules\Batching\Services;
 
+use App\Models\Hmo;
 use App\Models\Order;
 use App\Modules\Batching\Enums\BatchingStrategyEnum;
+use App\Modules\Batching\Exceptions\BatchingException;
 use App\Modules\Batching\Exceptions\HmoNotSetException;
 use App\Modules\Batching\Notifications\BatchOrderCreatedNotification;
 use App\Modules\Batching\Strategies\EncounterDateStrategy;
 use App\Modules\Batching\Strategies\SubmissionDateStrategy;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class BatchingService
@@ -50,9 +55,66 @@ class BatchingService
 
         $batch = app($strategy)->getBatch($order);
 
+        if (! $batch) {
+            throw new BatchingException('Failed to find or create a batch for this order.');
+        }
+
         $order->batch()->associate($batch);
         $order->save();
 
         $orderHmo->notify(new BatchOrderCreatedNotification($order));
+    }
+
+    public function asController(ActionRequest $request)
+    {
+        $payload = $request->validated();
+
+        $hmo = Hmo::query()->where('hmo_code', $payload['hmo_code'])->first();
+
+        DB::beginTransaction();
+
+        try {
+            $total = 0; // the total order amount
+
+            foreach ($payload['items'] as $item) {
+                $item['sub_total'] = $item['quantity'] * $item['unit_price'];
+                $total += $item['sub_total'];
+            }
+
+            $payload['hmo_id'] = $hmo->id;
+            $payload['total'] = $total;
+
+            $order = Order::create($payload);
+
+            $order->items()->createMany($payload['items']);
+
+            $this->handle($order); // handle the batching of the order
+
+            DB::commit();
+
+            session()->flash('alert', [
+                'type' => 'success',
+                'message' => 'Order has been submitted successfully.',
+            ]);
+
+            return back();
+        } catch (\Exception $exception) {
+            DB::rollBack();
+
+            Log::error($exception);
+
+            if ($exception instanceof HmoNotSetException || $exception instanceof BatchingException) {
+                $message = $exception->getMessage();
+            } else {
+                $message = 'An error occurred while trying to create a batch for this order. Please try again later.';
+            }
+
+            session()->flash('alert', [
+                'type' => 'error',
+                'message' => $message,
+            ]);
+
+            return back()->withErrors(['error' => $message]);
+        }
     }
 }
