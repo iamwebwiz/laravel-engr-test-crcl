@@ -21,22 +21,34 @@ Generate application key:
 php artisan key:generate
 ```
 
-Migrate database:
+Migrate database
 
 ```shell
 php artisan migrate
 ```
 
-Start Vite server:
+Seed the database
+
+```shell
+php artisan db:seed
+```
+
+Start Vite server
 
 ```shell
 npm run dev
 ```
 
-Serve application:
+Serve application
 
 ```shell
 php artisan serve
+```
+
+Open another terminal tab and start the queue worker
+
+```shell
+php artisan queue:work
 ```
 
 The UI is displayed on the root page
