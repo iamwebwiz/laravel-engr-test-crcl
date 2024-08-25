@@ -2,9 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Models\Hmo;
 use App\Modules\Batching\Enums\BatchingStrategyEnum;
+use App\Modules\Batching\Notifications\BatchOrderCreatedNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class OrderBatchingTest extends TestCase
@@ -53,6 +56,8 @@ class OrderBatchingTest extends TestCase
 
     public function testOrderBatchingSuccessfulWithEncounterDateStrategy()
     {
+        Notification::fake();
+
         $this->seed();
 
         $response = $this->post(route('batch-order'), [
@@ -67,10 +72,17 @@ class OrderBatchingTest extends TestCase
             'name' => "{$this->orderData['provider_name']} Aug 2024",
             'strategy' => BatchingStrategyEnum::ENCOUNTER_DATE->value,
         ]);
+
+        $hmo = Hmo::firstWhere('code', 'HMO-C');
+
+        Notification::assertCount(1);
+        Notification::assertSentTo($hmo, BatchOrderCreatedNotification::class);
     }
 
     public function testOrderBatchingSuccessfulWithSubmissionDateStrategy()
     {
+        Notification::fake();
+
         $this->seed();
 
         $response = $this->post(route('batch-order'), [
@@ -85,10 +97,17 @@ class OrderBatchingTest extends TestCase
             'name' => "{$this->orderData['provider_name']} Aug 2024",
             'strategy' => BatchingStrategyEnum::SUBMISSION_DATE->value,
         ]);
+
+        $hmo = Hmo::firstWhere('code', 'HMO-A');
+
+        Notification::assertCount(1);
+        Notification::assertSentTo($hmo, BatchOrderCreatedNotification::class);
     }
 
     public function testOrderBatchingSuccessfulWithNoBatchingStrategy()
     {
+        Notification::fake();
+
         $this->seed();
 
         $response = $this->post(route('batch-order'), [
@@ -102,5 +121,10 @@ class OrderBatchingTest extends TestCase
         $this->assertDatabaseHas('batches', [
             'strategy' => BatchingStrategyEnum::ENCOUNTER_DATE->value,
         ]);
+
+        $hmo = Hmo::firstWhere('code', 'HMO-D');
+
+        Notification::assertCount(1);
+        Notification::assertSentTo($hmo, BatchOrderCreatedNotification::class);
     }
 }
